@@ -1,55 +1,35 @@
-const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+client.on('messageCreate', async (message) => {
+  if (message.author.bot) return;
 
-const TOKEN = (process.env.TOKEN || '').trim();
+  if (message.content === '!testwelcome') {
+    const guildId = message.guild.id;
+    const channelId = welcomeChannels[guildId];
 
-const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
-  ]
-});
+    console.log('TEST guildId:', guildId);
+    console.log('TEST channelId:', channelId);
 
-const welcomeChannels = {
-  '1489760432120926228': '1489760432917844207', // main server
-  '1489874449527476224': '1489874451070849079'  // department hub
-};
+    if (!channelId) {
+      await message.reply('No welcome channel configured for this server.');
+      return;
+    }
 
-client.once('ready', () => {
-  console.log(`✅ Bot online: ${client.user.tag}`);
-});
+    const channel = message.guild.channels.cache.get(channelId);
+    if (!channel) {
+      await message.reply('Welcome channel not found.');
+      return;
+    }
 
-client.on('guildMemberAdd', async (member) => {
-  console.log(`👤 JOIN EVENT FIRED for ${member.user.tag} in guild ${member.guild.id}`);
+    const embed = new EmbedBuilder()
+      .setColor(0x24042E)
+      .setTitle('👋 Test Welcome')
+      .setDescription(`This is a test welcome message for ${message.author}.`);
 
-  const channelId = welcomeChannels[member.guild.id];
-  if (!channelId) {
-    console.log(`❌ No welcome channel configured for guild ${member.guild.id}`);
-    return;
-  }
-
-  const channel = member.guild.channels.cache.get(channelId);
-  if (!channel) {
-    console.log(`❌ Welcome channel not found: ${channelId}`);
-    return;
-  }
-
-  const embed = new EmbedBuilder()
-    .setColor(0x24042E)
-    .setTitle('👋 Welcome to Valley State RP')
-    .setDescription(`Welcome ${member}!`)
-    .addFields(
-      { name: '📖 Rules', value: 'Check the rules channel.' },
-      { name: '🎭 Roles', value: 'Grab your roles.' }
-    );
-
-  try {
-    await channel.send({ embeds: [embed] });
-    console.log(`✅ Welcome sent in guild ${member.guild.id}`);
-  } catch (err) {
-    console.error('❌ Failed to send welcome:', err);
+    try {
+      await channel.send({ embeds: [embed] });
+      await message.reply('Test welcome sent.');
+    } catch (err) {
+      console.error('TEST SEND ERROR:', err);
+      await message.reply('Failed to send test welcome.');
+    }
   }
 });
-
-client.login(TOKEN);
