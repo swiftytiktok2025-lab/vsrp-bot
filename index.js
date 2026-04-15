@@ -68,6 +68,7 @@ const client = new Client({
 });
 const TOKEN = process.env.TOKEN;
 console.log('TOKEN exists:', !!TOKEN);
+console.log('TOKEN length:', TOKEN ? TOKEN.length : 0);
 
 const welcomeChannels = {
   '1489760432120926228': '1489760432917844207',
@@ -188,10 +189,28 @@ client.on('shardError', (error) => {
   console.error('Discord shard error:', error);
 });
 
+client.on('error', (error) => {
+  console.error('Discord client error:', error);
+});
+
+client.on('shardError', (error) => {
+  console.error('Discord shard error:', error);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled rejection:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught exception:', error);
+});
+
+console.log('🚀 About to call client.login()');
+
 client.login(TOKEN)
   .then(() => {
-    console.log('🔐 Login request sent to Discord');
+    console.log('✅ client.login() resolved');
   })
   .catch((error) => {
-    console.error('❌ Login failed:', error);
+    console.error('❌ client.login() failed:', error);
   });
