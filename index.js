@@ -180,4 +180,18 @@ client.on('messageCreate', async (message) => {
   }
 });
 
-client.login(TOKEN);
+client.on('error', (error) => {
+  console.error('Discord client error:', error);
+});
+
+client.on('shardError', (error) => {
+  console.error('Discord shard error:', error);
+});
+
+client.login(TOKEN)
+  .then(() => {
+    console.log('🔐 Login request sent to Discord');
+  })
+  .catch((error) => {
+    console.error('❌ Login failed:', error);
+  });
