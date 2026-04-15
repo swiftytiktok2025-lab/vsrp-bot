@@ -2,16 +2,19 @@ const express = require('express');
 const { Client, GatewayIntentBits } = require('discord.js');
 
 const app = express();
-app.get('/', (req, res) => res.send('Bot is alive'));
+
+app.get('/', (req, res) => {
+  res.status(200).send('Bot is alive');
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🌐 Web server running on port ${PORT}`);
 });
 
-const TOKEN = process.env.TOKEN;
+const TOKEN = (process.env.TOKEN || '').trim();
 console.log('TOKEN exists:', !!TOKEN);
-console.log('TOKEN length:', TOKEN ? TOKEN.length : 0);
+console.log('TOKEN length:', TOKEN.length);
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
