@@ -66,8 +66,8 @@ const client = new Client({
     GatewayIntentBits.MessageContent
   ]
 });
-
 const TOKEN = process.env.TOKEN;
+console.log('TOKEN exists:', !!TOKEN);
 
 const welcomeChannels = {
   '1489760432120926228': '1489760432917844207',
@@ -179,4 +179,5 @@ client.on('messageCreate', async (message) => {
     await message.channel.send({ embeds: [donationEmbed] });
   }
 });
+
 client.login(TOKEN);
