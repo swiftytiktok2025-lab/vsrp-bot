@@ -1,52 +1,48 @@
-client.on('guildMemberAdd', async (member) => {
-  if (member.user.bot) return;
+const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
 
-  let channelId;
-  let embed;
+const TOKEN = (process.env.TOKEN || '').trim();
 
-  if (member.guild.id === '1489760432120926228') {
-    channelId = '1489760432917844207';
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent
+  ]
+});
 
-    embed = new EmbedBuilder()
+// ✅ BOT READY
+client.once('ready', () => {
+  console.log(`✅ Bot online: ${client.user.tag}`);
+});
+
+// ❌ WELCOME SYSTEM DISABLED
+// (nothing will happen when someone joins)
+
+// ✅ OPTIONAL COMMANDS STILL WORK
+client.on('messageCreate', async (message) => {
+  if (message.author.bot) return;
+
+  if (message.content === '!donationembed') {
+    const donationEmbed = new EmbedBuilder()
       .setColor(0x24042E)
-      .setTitle('👋 Welcome to Valley State RP')
-      .setDescription(
-        `Welcome ${member} to **Valley State Roleplay**.\n\nComplete the steps below to get started.`
-      )
+      .setTitle('💎 Valley State RP | Support & Donations')
+      .setDescription('Support the server and unlock premium perks.')
       .addFields(
-        { name: '📖 Rules', value: '<#1489760432917844208>' },
-        { name: '🎭 Roles', value: '<#1489760433199120445>' },
-        { name: '🎮 How to Join', value: '<#1489791922351640637>' },
-        { name: '❓ Help', value: '<#1489792058012078090>' }
+        {
+          name: '🎁 Benefits',
+          value: '• Priority Queue\n• VIP Roles\n• Custom Content\n• In-Game Perks'
+        },
+        {
+          name: '🛒 Store',
+          value: '<#1492688382810394816>'
+        }
       )
-      .setFooter({ text: 'Valley State RP • Your Story Starts Here' });
-  } else if (member.guild.id === '1489874449527476224') {
-    channelId = '1489874451070849079';
+      .setFooter({ text: 'Valley State RP • Premium Support System' });
 
-    embed = new EmbedBuilder()
-      .setColor(0x24042E)
-      .setTitle('🏛️ Welcome to the Department Hub')
-      .setDescription(
-        `Welcome ${member} to the **Valley State Department Hub**.\n\nUse this server to apply, transfer, and stay updated with departments.`
-      )
-      .addFields(
-        { name: '👋 Start Here', value: '<#1489874451070849079>' },
-        { name: '📢 Announcements', value: '<#1489874451284623366>' },
-        { name: '🎫 Support', value: '<#1489874455587979312>' },
-        { name: '👮 Applications', value: '<#1490187586449313983>' }
-      )
-      .setFooter({ text: 'Valley State RP Department Hub' });
-  }
-
-  if (!channelId || !embed) return;
-
-  try {
-    const channel = await client.channels.fetch(channelId);
-    if (!channel) return;
-
-    await channel.send({ embeds: [embed] });
-    console.log(`✅ Welcome sent in ${member.guild.name} for ${member.user.tag}`);
-  } catch (err) {
-    console.error('❌ Failed to send welcome:', err);
+    await message.channel.send({ embeds: [donationEmbed] });
   }
 });
+
+// ✅ LOGIN
+client.login(TOKEN);
