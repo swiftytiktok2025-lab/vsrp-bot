@@ -9,62 +9,88 @@ const client = new Client({
   ]
 });
 
-const welcomeChannels = {
-  '1489760432120926228': '1489760432917844207', // Main server
-  '1489874449527476224': '1489874451070849079'  // Department hub
+// ✅ YOUR SERVERS + CHANNELS
+const SERVERS = {
+  MAIN: '1489760432120926228',
+  HUB: '1489874449527476224'
 };
 
-client.once('ready', async () => {
+const CHANNELS = {
+  MAIN_WELCOME: '1489760432917844207',
+  HUB_WELCOME: '1489874451070849079'
+};
+
+// ✅ BOT READY
+client.once('ready', () => {
   console.log(`✅ Bot online: ${client.user.tag}`);
-
-  // Startup test to both welcome channels
-  for (const [guildId, channelId] of Object.entries(welcomeChannels)) {
-    try {
-      const channel = await client.channels.fetch(channelId);
-      if (!channel) {
-        console.log(`❌ Startup test failed: channel not found for guild ${guildId}`);
-        continue;
-      }
-
-      const embed = new EmbedBuilder()
-        .setColor(0x24042E)
-        .setTitle('🧪 Startup Test')
-        .setDescription(`Bot is connected and can send messages here.\nGuild: ${guildId}\nChannel: ${channelId}`);
-
-      await channel.send({ embeds: [embed] });
-      console.log(`✅ Startup test sent to ${channelId}`);
-    } catch (err) {
-      console.error(`❌ Startup test failed for ${channelId}:`, err);
-    }
-  }
 });
 
+// ✅ WELCOME SYSTEM
 client.on('guildMemberAdd', async (member) => {
-  console.log(`👤 JOIN EVENT: ${member.user.tag} in guild ${member.guild.id}`);
+  console.log(`👤 JOIN: ${member.user.tag} | Guild: ${member.guild.id}`);
 
-  const channelId = welcomeChannels[member.guild.id];
+  let channelId;
+  let embed;
+
+  // 🔵 MAIN SERVER
+  if (member.guild.id === SERVERS.MAIN) {
+    channelId = CHANNELS.MAIN_WELCOME;
+
+    embed = new EmbedBuilder()
+      .setColor(0x24042E)
+      .setTitle('👋 Welcome to Valley State RP')
+      .setDescription(
+        `Welcome ${member} to **Valley State Roleplay**.\n\n` +
+        `Make sure you complete the steps below before getting started.`
+      )
+      .addFields(
+        { name: '📖 Rules', value: '<#1489760432917844208>' },
+        { name: '🎭 Roles', value: '<#1489760433199120445>' },
+        { name: '🎮 How to Join', value: '<#1489791922351640637>' },
+        { name: '❓ Help', value: '<#1489792058012078090>' }
+      )
+      .setFooter({ text: 'Valley State RP • Your Story Starts Here' });
+  }
+
+  // 🟣 DEPARTMENT HUB
+  else if (member.guild.id === SERVERS.HUB) {
+    channelId = CHANNELS.HUB_WELCOME;
+
+    embed = new EmbedBuilder()
+      .setColor(0x24042E)
+      .setTitle('🏛️ Welcome to the Department Hub')
+      .setDescription(
+        `Welcome ${member} to the **Valley State Department Hub**.\n\n` +
+        `Use this server to apply, transfer, and stay updated with departments.`
+      )
+      .addFields(
+        { name: '👋 Start Here', value: '<#1489874451070849079>' },
+        { name: '📢 Announcements', value: '<#1489874451284623366>' },
+        { name: '🎫 Support', value: '<#1489874455587979312>' },
+        { name: '👮 Applications', value: '<#1490187586449313983>' }
+      )
+      .setFooter({ text: 'Valley State RP Department Hub' });
+  }
+
   if (!channelId) {
-    console.log(`❌ No welcome channel configured for guild ${member.guild.id}`);
+    console.log('❌ No matching server');
     return;
   }
 
   try {
     const channel = await client.channels.fetch(channelId);
+
     if (!channel) {
-      console.log(`❌ Welcome channel not found: ${channelId}`);
+      console.log(`❌ Channel not found: ${channelId}`);
       return;
     }
 
-    const embed = new EmbedBuilder()
-      .setColor(0x24042E)
-      .setTitle('👋 Welcome to Valley State RP')
-      .setDescription(`Welcome ${member}! Glad to have you here.`);
-
     await channel.send({ embeds: [embed] });
-    console.log(`✅ Welcome sent for ${member.user.tag}`);
+    console.log(`✅ Welcome sent in ${member.guild.name}`);
   } catch (err) {
-    console.error(`❌ Failed to send welcome for ${member.user.tag}:`, err);
+    console.error('❌ Failed to send welcome:', err);
   }
 });
 
+// ✅ LOGIN
 client.login(TOKEN);
